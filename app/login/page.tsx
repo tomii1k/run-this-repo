@@ -1,18 +1,26 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { FormEvent, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { FormEvent, useMemo, useState } from "react";
 import { createClient } from "../../lib/supabase/client";
 import AuthNav from "../../components/AuthNav";
 
 export default function LoginPage() {
   const supabase = createClient();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  const callbackError = useMemo(() => {
+    if (searchParams.get("error") === "auth_callback_failed") {
+      return "Authentication failed. Please try logging in again.";
+    }
+    return null;
+  }, [searchParams]);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -27,7 +35,17 @@ export default function LoginPage() {
     setIsLoading(false);
 
     if (signInError) {
-      setError(signInError.message);
+      const normalized = signInError.message.toLowerCase();
+      if (normalized.includes("email not confirmed")) {
+        setError("Please confirm your email before logging in. Check your inbox.");
+      } else if (
+        normalized.includes("invalid login credentials") ||
+        normalized.includes("invalid_credentials")
+      ) {
+        setError("Invalid email or password.");
+      } else {
+        setError(signInError.message);
+      }
       return;
     }
 
@@ -76,6 +94,7 @@ export default function LoginPage() {
               />
             </div>
 
+            {callbackError ? <p className="text-sm text-red-700">{callbackError}</p> : null}
             {error ? <p className="text-sm text-red-700">{error}</p> : null}
 
             <button

@@ -1,14 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { createClient } from "../../lib/supabase/client";
 import AuthNav from "../../components/AuthNav";
 
 export default function SignupPage() {
   const supabase = createClient();
-  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -38,6 +36,7 @@ export default function SignupPage() {
       email,
       password,
       options: {
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
         data: {
           marketing_opt_in: marketingOptIn,
         },
@@ -46,17 +45,26 @@ export default function SignupPage() {
     setIsLoading(false);
 
     if (signUpError) {
-      setError(signUpError.message);
+      const normalized = signUpError.message.toLowerCase();
+      if (normalized.includes("already") || normalized.includes("registered")) {
+        setError("This email is already registered. Please log in instead.");
+      } else {
+        setError(signUpError.message);
+      }
       return;
     }
 
-    if (data.session) {
-      router.push("/dashboard");
-      router.refresh();
+    if (!data.user) {
+      setError("Unable to create account. Please try again.");
       return;
     }
 
-    setMessage("Signup successful. Check your email to confirm your account.");
+    if (Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+      setError("This email is already registered. Please log in instead.");
+      return;
+    }
+
+    setMessage("Account created. Please check your email inbox to confirm your account.");
   };
 
   return (
