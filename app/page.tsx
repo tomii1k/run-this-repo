@@ -1,65 +1,315 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import React, { useState } from "react";
+import RepoInputForm from "./RepoInputForm";
+import AnalysisResult from "./AnalysisResult";
+import type { RepoAnalysis } from "../lib/schemas/repoAnalysisSchema";
+import ErrorFixer from "../components/ErrorFixer";
+
+export default function HomePage() {
+  const isDevelopment = process.env.NODE_ENV === "development";
+  const [submittedRepo, setSubmittedRepo] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [analysis, setAnalysis] = useState<RepoAnalysis | null>(null);
+
+  async function handleAnalyze(url: string) {
+    setSubmittedRepo(url);
+    setIsLoading(true);
+    setError(null);
+    setAnalysis(null);
+
+    try {
+      const response = await fetch("/api/analyze", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ repoUrl: url }),
+      });
+
+      let data: RepoAnalysis | { error?: string } | null = null;
+      try {
+        data = (await response.json()) as RepoAnalysis | { error?: string };
+      } catch (parseError) {
+        if (isDevelopment) {
+          console.error("Failed to parse /api/analyze response JSON", parseError);
+        }
+      }
+
+      if (!response.ok) {
+        const message =
+          data && "error" in data && data.error
+            ? data.error
+            : "Something went wrong while analyzing this repository.";
+        setError(message);
+        return;
+      }
+
+      if (!data) {
+        setError("Unexpected response from the analyzer. Please try again.");
+        return;
+      }
+
+      setAnalysis(data as RepoAnalysis);
+    } catch (requestError) {
+      if (isDevelopment) {
+        console.error("POST /api/analyze failed", requestError);
+      }
+      setError("Network error. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  // Show results page if analysis has been submitted
+  if (submittedRepo && (analysis || error || isLoading)) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <nav className="border-b border-gray-200 bg-white">
+          <div className="mx-auto max-w-6xl px-4 py-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between">
+              <div className="text-xl font-bold text-gray-900">RunThisRepo</div>
+              <button
+                onClick={() => {
+                  setSubmittedRepo(null);
+                  setAnalysis(null);
+                  setError(null);
+                }}
+                className="text-sm text-gray-600 hover:text-gray-900"
+              >
+                ← Back to home
+              </button>
+            </div>
+          </div>
+        </nav>
+
+        <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
+          <AnalysisResult
+            repoUrl={submittedRepo}
+            isLoading={isLoading}
+            error={error}
+            analysis={analysis}
+          />
+
+          {analysis && submittedRepo ? (
+            <section className="mt-8">
+              <ErrorFixer repoUrl={submittedRepo} previousAnalysis={analysis} />
+            </section>
+          ) : null}
+        </main>
+      </div>
+    );
+  }
+
+  // Show landing page
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <div className="min-h-screen bg-white">
+      <nav className="border-b border-gray-100">
+        <div className="mx-auto max-w-6xl px-4 py-4 sm:px-6 lg:px-8">
+          <div className="text-xl font-bold text-gray-900">RunThisRepo</div>
+        </div>
+      </nav>
+
+      <main className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+        {/* Hero Section */}
+        <section className="py-16 sm:py-24">
+          <div className="text-center">
+            <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl md:text-6xl">
+              Run any GitHub repo
+              <span className="block text-blue-600">without guessing</span>
+            </h1>
+            <p className="mx-auto mt-6 max-w-2xl text-lg text-gray-600 sm:text-xl">
+              Paste a public GitHub repository URL and get exact setup steps, required environment
+              variables, common errors, and safety warnings.
+            </p>
+          </div>
+
+          {/* Input Section */}
+          <div className="mx-auto mt-12 max-w-xl">
+            <RepoInputForm onAnalyze={handleAnalyze} isLoading={isLoading} />
+          </div>
+        </section>
+
+        {/* Features Section */}
+        <section className="py-16 sm:py-24">
+          <div className="mb-12 text-center">
+            <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl">
+              Everything you need to get started
+            </h2>
+            <p className="mx-auto mt-4 max-w-xl text-lg text-gray-600">
+              Get all the information needed to run any repository in seconds.
+            </p>
+          </div>
+
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+            {/* Feature 1 */}
+            <div className="rounded-lg border border-gray-200 bg-gray-50 p-6">
+              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-blue-100">
+                <svg
+                  className="h-6 w-6 text-blue-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+              </div>
+              <h3 className="font-semibold text-gray-900">Setup Guide</h3>
+              <p className="mt-2 text-sm text-gray-600">
+                Step-by-step instructions for Windows, Mac, and Linux
+              </p>
+            </div>
+
+            {/* Feature 2 */}
+            <div className="rounded-lg border border-gray-200 bg-gray-50 p-6">
+              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-blue-100">
+                <svg
+                  className="h-6 w-6 text-blue-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"
+                  />
+                </svg>
+              </div>
+              <h3 className="font-semibold text-gray-900">Env Variables</h3>
+              <p className="mt-2 text-sm text-gray-600">
+                Identify and configure all required environment variables
+              </p>
+            </div>
+
+            {/* Feature 3 */}
+            <div className="rounded-lg border border-gray-200 bg-gray-50 p-6">
+              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-blue-100">
+                <svg
+                  className="h-6 w-6 text-blue-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M13 10V3L4 14h7v7l9-11h-7z"
+                  />
+                </svg>
+              </div>
+              <h3 className="font-semibold text-gray-900">Error Fixes</h3>
+              <p className="mt-2 text-sm text-gray-600">
+                Common errors with explanations and quick fixes
+              </p>
+            </div>
+
+            {/* Feature 4 */}
+            <div className="rounded-lg border border-gray-200 bg-gray-50 p-6">
+              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-blue-100">
+                <svg
+                  className="h-6 w-6 text-blue-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                  />
+                </svg>
+              </div>
+              <h3 className="font-semibold text-gray-900">Safety Scan</h3>
+              <p className="mt-2 text-sm text-gray-600">
+                Identify security warnings and suspicious dependencies
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Example Section */}
+        <section className="py-16 sm:py-24">
+          <div className="mb-12 text-center">
+            <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl">How it works</h2>
+            <p className="mx-auto mt-4 max-w-xl text-lg text-gray-600">
+              Paste any GitHub repository URL above and get instant setup guidance.
+            </p>
+          </div>
+
+          <div className="rounded-lg border border-gray-200 bg-gray-50 p-8">
+            <div className="space-y-4">
+              <div className="flex gap-4">
+                <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-blue-600 text-white font-semibold text-sm">
+                  1
+                </div>
+                <div>
+                  <p className="font-semibold text-gray-900">Enter a GitHub repository URL</p>
+                  <p className="mt-1 text-sm text-gray-600">
+                    Example: https://github.com/vercel/next.js
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex gap-4">
+                <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-blue-600 text-white font-semibold text-sm">
+                  2
+                </div>
+                <div>
+                  <p className="font-semibold text-gray-900">Click Analyze</p>
+                  <p className="mt-1 text-sm text-gray-600">
+                    We fetch the repository and analyze its configuration
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex gap-4">
+                <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-blue-600 text-white font-semibold text-sm">
+                  3
+                </div>
+                <div>
+                  <p className="font-semibold text-gray-900">Get your setup guide</p>
+                  <p className="mt-1 text-sm text-gray-600">
+                    Detailed steps, environment variables, and common errors specific to that repo
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* CTA Section */}
+        <section className="py-16 text-center sm:py-24">
+          <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl">
+            Ready to get started?
+          </h2>
+          <p className="mx-auto mt-4 max-w-xl text-lg text-gray-600">
+            Paste any public GitHub repository URL above to analyze it.
           </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+
+          <div className="mx-auto mt-12 max-w-xl">
+            <RepoInputForm onAnalyze={handleAnalyze} isLoading={isLoading} />
+          </div>
+        </section>
       </main>
+
+      {/* Footer */}
+      <footer className="border-t border-gray-100 bg-gray-50">
+        <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
+          <div className="text-center text-sm text-gray-600">
+            <p>RunThisRepo helps beginners set up any GitHub repository with confidence.</p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
