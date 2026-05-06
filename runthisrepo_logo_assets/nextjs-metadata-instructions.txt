@@ -1,0 +1,9 @@
+Add or update metadata in app/layout.tsx:
+
+export const metadata = {
+  title: "RunThisRepo — GitHub Repo Setup Assistant",
+  description:
+    "Paste any GitHub repository URL and get setup steps, environment variables, error fixes, and safety insights.",
+};
+
+This fixes the browser tab showing "Create Next App".

@@ -1,0 +1,24 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="80" y1="64" x2="432" y2="448" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2563EB"/>
+      <stop offset="1" stop-color="#06B6D4"/>
+    </linearGradient>
+    <filter id="shadow" x="0" y="0" width="512" height="512" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="18" stdDeviation="22" flood-color="#0F172A" flood-opacity="0.22"/>
+    </filter>
+  </defs>
+
+  <rect x="56" y="56" width="400" height="400" rx="104" fill="url(#bg)" filter="url(#shadow)"/>
+
+  <!-- Terminal prompt -->
+  <path d="M145 189L205 249L145 309" stroke="white" stroke-width="34" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M232 323H335" stroke="white" stroke-width="34" stroke-linecap="round"/>
+
+  <!-- Git branch / run symbol -->
+  <circle cx="326" cy="165" r="25" fill="white"/>
+  <circle cx="326" cy="347" r="25" fill="white"/>
+  <circle cx="384" cy="256" r="25" fill="white"/>
+  <path d="M326 190V218C326 239 343 256 364 256H384" stroke="white" stroke-width="24" stroke-linecap="round"/>
+  <path d="M326 322V294C326 273 343 256 364 256H384" stroke="white" stroke-width="24" stroke-linecap="round"/>
+</svg>
