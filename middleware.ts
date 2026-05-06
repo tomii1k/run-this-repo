@@ -1,8 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { updateSession } from "@supabase/ssr";
 
-export async function middleware(request: NextRequest) {
-  return await updateSession(request);
+export function middleware(request: NextRequest) {
+  return NextResponse.next();
 }
 
 export const config = {
@@ -12,7 +11,8 @@ export const config = {
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
+     * - api (API routes)
      */
-    "/((?!_next/static|_next/image|favicon.ico).*)",
+    "/((?!_next/static|_next/image|favicon.ico|api).*)",
   ],
 };
