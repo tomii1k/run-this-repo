@@ -6,9 +6,13 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "setup:dirs": "node create-dirs.js",
+    "setup:supabase": "node deploy-files.js"
   },
   "dependencies": {
+    "@supabase/ssr": "^0.10.2",
+    "@supabase/supabase-js": "^2.105.3",
     "next": "16.2.4",
     "openai": "^6.36.0",
     "react": "19.2.4",
