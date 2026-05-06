@@ -6,6 +6,7 @@ import AnalysisResult from "./AnalysisResult";
 import type { RepoAnalysis } from "../lib/schemas/repoAnalysisSchema";
 import ErrorFixer from "../components/ErrorFixer";
 import AuthNav from "../components/AuthNav";
+import PublicFooter from "../components/PublicFooter";
 
 export default function HomePage() {
   const isDevelopment = process.env.NODE_ENV === "development";
@@ -93,6 +94,7 @@ export default function HomePage() {
             </section>
           ) : null}
         </main>
+        <PublicFooter />
       </div>
     );
   }
@@ -300,14 +302,7 @@ export default function HomePage() {
         </section>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-gray-100 bg-gray-50">
-        <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
-          <div className="text-center text-sm text-gray-600">
-            <p>RunThisRepo helps beginners set up any GitHub repository with confidence.</p>
-          </div>
-        </div>
-      </footer>
+      <PublicFooter />
     </div>
   );
 }
