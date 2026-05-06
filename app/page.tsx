@@ -5,6 +5,7 @@ import RepoInputForm from "./RepoInputForm";
 import AnalysisResult from "./AnalysisResult";
 import type { RepoAnalysis } from "../lib/schemas/repoAnalysisSchema";
 import ErrorFixer from "../components/ErrorFixer";
+import AuthNav from "../components/AuthNav";
 
 export default function HomePage() {
   const isDevelopment = process.env.NODE_ENV === "development";
@@ -66,25 +67,19 @@ export default function HomePage() {
   if (submittedRepo && (analysis || error || isLoading)) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <nav className="border-b border-gray-200 bg-white">
-          <div className="mx-auto max-w-6xl px-4 py-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between">
-              <div className="text-xl font-bold text-gray-900">RunThisRepo</div>
-              <button
-                onClick={() => {
-                  setSubmittedRepo(null);
-                  setAnalysis(null);
-                  setError(null);
-                }}
-                className="text-sm text-gray-600 hover:text-gray-900"
-              >
-                ← Back to home
-              </button>
-            </div>
-          </div>
-        </nav>
+        <AuthNav />
 
         <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
+          <button
+            onClick={() => {
+              setSubmittedRepo(null);
+              setAnalysis(null);
+              setError(null);
+            }}
+            className="mb-4 text-sm text-gray-600 hover:text-gray-900"
+          >
+            ← Back to home
+          </button>
           <AnalysisResult
             repoUrl={submittedRepo}
             isLoading={isLoading}
@@ -105,11 +100,7 @@ export default function HomePage() {
   // Show landing page
   return (
     <div className="min-h-screen bg-white">
-      <nav className="border-b border-gray-100">
-        <div className="mx-auto max-w-6xl px-4 py-4 sm:px-6 lg:px-8">
-          <div className="text-xl font-bold text-gray-900">RunThisRepo</div>
-        </div>
-      </nav>
+      <AuthNav />
 
       <main className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         {/* Hero Section */}
@@ -132,7 +123,7 @@ export default function HomePage() {
         </section>
 
         {/* Features Section */}
-        <section className="py-16 sm:py-24">
+        <section id="features" className="py-16 sm:py-24">
           <div className="mb-12 text-center">
             <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl">
               Everything you need to get started
@@ -238,7 +229,7 @@ export default function HomePage() {
         </section>
 
         {/* Example Section */}
-        <section className="py-16 sm:py-24">
+        <section id="how-it-works" className="py-16 sm:py-24">
           <div className="mb-12 text-center">
             <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl">How it works</h2>
             <p className="mx-auto mt-4 max-w-xl text-lg text-gray-600">
@@ -299,6 +290,13 @@ export default function HomePage() {
           <div className="mx-auto mt-12 max-w-xl">
             <RepoInputForm onAnalyze={handleAnalyze} isLoading={isLoading} />
           </div>
+        </section>
+
+        <section id="pricing" className="pb-16 text-center sm:pb-24">
+          <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl">Pricing</h2>
+          <p className="mx-auto mt-4 max-w-2xl text-lg text-gray-600">
+            Free during MVP. Analyze public repositories and save your results in your dashboard.
+          </p>
         </section>
       </main>
 
