@@ -16,7 +16,7 @@ export default async function DashboardPage() {
     "use server";
     const serverSupabase = await createClient();
     await serverSupabase.auth.signOut();
-    redirect("/");
+    redirect("/login?message=logged_out");
   }
 
   return (

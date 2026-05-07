@@ -15,11 +15,30 @@ export default function ForgotPasswordPage() {
     setIsLoading(true);
     setSuccessMessage(null);
 
-    await supabase.auth.resetPasswordForEmail(email, {
+    if (process.env.NODE_ENV === "development") {
+      console.log("password reset requested");
+    }
+
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/reset-password`,
     });
 
     setIsLoading(false);
+
+    if (error) {
+      if (process.env.NODE_ENV === "development") {
+        console.log("password reset request error", error.message);
+      }
+      setSuccessMessage(
+        "If an account exists for this email, password reset instructions have been sent."
+      );
+      return;
+    }
+
+    if (process.env.NODE_ENV === "development") {
+      console.log("password reset request success");
+    }
+
     setSuccessMessage(
       "If an account exists for this email, password reset instructions have been sent."
     );

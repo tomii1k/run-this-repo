@@ -78,7 +78,7 @@ export default function ResetPasswordPage() {
       return;
     }
 
-    router.push("/login?message=password_reset_success");
+    router.push("/login?message=password_updated");
     router.refresh();
   };
 

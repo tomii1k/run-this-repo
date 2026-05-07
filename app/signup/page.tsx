@@ -12,7 +12,7 @@ export default function SignupPage() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [acceptTerms, setAcceptTerms] = useState(false);
-  const [marketingOptIn, setMarketingOptIn] = useState(false);
+  const [marketingConsent, setMarketingConsent] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -48,7 +48,9 @@ export default function SignupPage() {
       options: {
         emailRedirectTo: `${window.location.origin}/auth/callback`,
         data: {
-          marketing_opt_in: marketingOptIn,
+          marketing_consent: marketingConsent,
+          terms_accepted: true,
+          terms_accepted_at: new Date().toISOString(),
         },
       },
     });
@@ -161,8 +163,8 @@ export default function SignupPage() {
           <label className="flex items-start gap-2 text-sm text-gray-700">
             <input
               type="checkbox"
-              checked={marketingOptIn}
-              onChange={(e) => setMarketingOptIn(e.target.checked)}
+              checked={marketingConsent}
+              onChange={(e) => setMarketingConsent(e.target.checked)}
               className="mt-0.5 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-600"
             />
             <span>I agree to receive product updates and marketing emails.</span>

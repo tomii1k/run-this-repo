@@ -23,8 +23,11 @@ export default function LoginPage() {
   }, [searchParams]);
 
   const resetSuccessMessage = useMemo(() => {
-    if (searchParams.get("message") === "password_reset_success") {
-      return "Password updated successfully. Please log in with your new password.";
+    if (searchParams.get("message") === "password_updated") {
+      return "Your password has been updated. Please log in with your new password.";
+    }
+    if (searchParams.get("message") === "logged_out") {
+      return "You have been logged out successfully.";
     }
     return null;
   }, [searchParams]);
