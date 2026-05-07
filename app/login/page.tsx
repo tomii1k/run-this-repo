@@ -22,6 +22,13 @@ export default function LoginPage() {
     return null;
   }, [searchParams]);
 
+  const resetSuccessMessage = useMemo(() => {
+    if (searchParams.get("message") === "password_reset_success") {
+      return "Password updated successfully. Please log in with your new password.";
+    }
+    return null;
+  }, [searchParams]);
+
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError(null);
@@ -95,6 +102,9 @@ export default function LoginPage() {
             </div>
 
             {callbackError ? <p className="text-sm text-red-700">{callbackError}</p> : null}
+            {resetSuccessMessage ? (
+              <p className="text-sm text-green-700">{resetSuccessMessage}</p>
+            ) : null}
             {error ? <p className="text-sm text-red-700">{error}</p> : null}
 
             <button
@@ -110,9 +120,9 @@ export default function LoginPage() {
             <Link href="/signup" className="text-blue-700 hover:text-blue-800">
               Need an account? Sign up
             </Link>
-            <span className="text-gray-500" aria-disabled="true">
-              Forgot password coming soon
-            </span>
+            <Link href="/forgot-password" className="text-gray-600 hover:text-gray-800">
+              Forgot password?
+            </Link>
           </div>
         </div>
       </main>

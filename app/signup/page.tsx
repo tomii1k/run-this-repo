@@ -7,6 +7,7 @@ import AuthNav from "../../components/AuthNav";
 
 export default function SignupPage() {
   const supabase = createClient();
+  const isDevelopment = process.env.NODE_ENV === "development";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -20,13 +21,22 @@ export default function SignupPage() {
     event.preventDefault();
     setError(null);
     setMessage(null);
+    if (isDevelopment) {
+      console.info("signup started");
+    }
 
     if (password !== confirmPassword) {
+      if (isDevelopment) {
+        console.info("signup validation failed");
+      }
       setError("Passwords do not match.");
       return;
     }
 
     if (!acceptTerms) {
+      if (isDevelopment) {
+        console.info("signup validation failed");
+      }
       setError("You must agree to the Terms of Service and Privacy Policy.");
       return;
     }
@@ -45,6 +55,9 @@ export default function SignupPage() {
     setIsLoading(false);
 
     if (signUpError) {
+      if (isDevelopment) {
+        console.error("signup error", signUpError.message);
+      }
       const normalized = signUpError.message.toLowerCase();
       if (normalized.includes("already") || normalized.includes("registered")) {
         setError("This email is already registered. Please log in instead.");
@@ -55,15 +68,24 @@ export default function SignupPage() {
     }
 
     if (!data.user) {
+      if (isDevelopment) {
+        console.error("signup error", "Unable to create account. Please try again.");
+      }
       setError("Unable to create account. Please try again.");
       return;
     }
 
     if (Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+      if (isDevelopment) {
+        console.info("signup validation failed");
+      }
       setError("This email is already registered. Please log in instead.");
       return;
     }
 
+    if (isDevelopment) {
+      console.info("signup success");
+    }
     setMessage("Account created. Please check your email inbox to confirm your account.");
   };
 
