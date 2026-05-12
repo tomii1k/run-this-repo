@@ -67,19 +67,22 @@ export default function HomePage() {
   // Show results page if analysis has been submitted
   if (submittedRepo && (analysis || error || isLoading)) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-slate-50">
         <AuthNav />
 
-        <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
+        <main className="mx-auto w-full max-w-5xl px-4 py-12 sm:px-6 lg:px-8">
           <button
             onClick={() => {
               setSubmittedRepo(null);
               setAnalysis(null);
               setError(null);
             }}
-            className="mb-4 text-sm text-gray-600 hover:text-gray-900"
+            className="mb-8 flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-slate-900"
           >
-            ← Back to home
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            Back to home
           </button>
           <AnalysisResult
             repoUrl={submittedRepo}
