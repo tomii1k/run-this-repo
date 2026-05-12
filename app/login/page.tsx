@@ -52,7 +52,7 @@ export default function LoginPage() {
         normalized.includes("invalid login credentials") ||
         normalized.includes("invalid_credentials")
       ) {
-        setError("Invalid email or password.");
+        setError("Wrong email or password.");
       } else {
         setError(signInError.message);
       }

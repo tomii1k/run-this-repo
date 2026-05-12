@@ -5,6 +5,34 @@ import { FormEvent, useState } from "react";
 import { createClient } from "../../lib/supabase/client";
 import AuthNav from "../../components/AuthNav";
 
+interface PasswordValidation {
+  minLength: boolean;
+  hasUppercase: boolean;
+  hasLowercase: boolean;
+  hasNumber: boolean;
+  hasSpecial: boolean;
+}
+
+function validatePassword(password: string): PasswordValidation {
+  return {
+    minLength: password.length >= 8,
+    hasUppercase: /[A-Z]/.test(password),
+    hasLowercase: /[a-z]/.test(password),
+    hasNumber: /[0-9]/.test(password),
+    hasSpecial: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password),
+  };
+}
+
+function isPasswordValid(validation: PasswordValidation): boolean {
+  return (
+    validation.minLength &&
+    validation.hasUppercase &&
+    validation.hasLowercase &&
+    validation.hasNumber &&
+    validation.hasSpecial
+  );
+}
+
 export default function SignupPage() {
   const supabase = createClient();
   const isDevelopment = process.env.NODE_ENV === "development";
@@ -16,6 +44,18 @@ export default function SignupPage() {
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [passwordValidation, setPasswordValidation] = useState<PasswordValidation>({
+    minLength: false,
+    hasUppercase: false,
+    hasLowercase: false,
+    hasNumber: false,
+    hasSpecial: false,
+  });
+
+  const handlePasswordChange = (value: string) => {
+    setPassword(value);
+    setPasswordValidation(validatePassword(value));
+  };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -23,6 +63,15 @@ export default function SignupPage() {
     setMessage(null);
     if (isDevelopment) {
       console.info("signup started");
+    }
+
+    // Validate password strength
+    if (!isPasswordValid(passwordValidation)) {
+      if (isDevelopment) {
+        console.info("signup validation failed");
+      }
+      setError("Please ensure your password meets all requirements.");
+      return;
     }
 
     if (password !== confirmPassword) {
@@ -91,6 +140,15 @@ export default function SignupPage() {
     setMessage("Account created. Please check your email inbox to confirm your account.");
   };
 
+  const PasswordCheckItem = ({ passed, text }: { passed: boolean; text: string }) => (
+    <div className="flex items-center gap-2 text-sm">
+      <span className={`inline-block h-4 w-4 rounded-full text-center text-xs font-bold ${passed ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-400'}`}>
+        {passed ? '✓' : '○'}
+      </span>
+      <span className={passed ? 'text-green-700' : 'text-gray-600'}>{text}</span>
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-gray-50">
       <AuthNav />
@@ -100,78 +158,95 @@ export default function SignupPage() {
           <p className="mt-2 text-center text-sm text-gray-600">Start saving analyses to your dashboard.</p>
 
           <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-              Email
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                Email
+              </label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                autoComplete="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={isLoading}
+                className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600/20 disabled:bg-gray-100 disabled:text-gray-500"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                Password
+              </label>
+              <input
+                id="password"
+                name="password"
+                type="password"
+                autoComplete="new-password"
+                required
+                value={password}
+                onChange={(e) => handlePasswordChange(e.target.value)}
+                disabled={isLoading}
+                className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600/20 disabled:bg-gray-100 disabled:text-gray-500"
+              />
+              {password && (
+                <div className="mt-3 space-y-1 rounded-lg bg-gray-50 p-3">
+                  <PasswordCheckItem passed={passwordValidation.minLength} text="Minimum 8 characters" />
+                  <PasswordCheckItem passed={passwordValidation.hasUppercase} text="One uppercase letter" />
+                  <PasswordCheckItem passed={passwordValidation.hasLowercase} text="One lowercase letter" />
+                  <PasswordCheckItem passed={passwordValidation.hasNumber} text="One number" />
+                  <PasswordCheckItem passed={passwordValidation.hasSpecial} text="One special character" />
+                </div>
+              )}
+            </div>
+
+            <div>
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+                Confirm password
+              </label>
+              <input
+                id="confirmPassword"
+                name="confirmPassword"
+                type="password"
+                autoComplete="new-password"
+                required
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                disabled={isLoading}
+                className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600/20 disabled:bg-gray-100 disabled:text-gray-500"
+              />
+              {confirmPassword && password !== confirmPassword && (
+                <p className="mt-1 text-xs text-red-600">Passwords do not match.</p>
+              )}
+            </div>
+
+            <label className="flex items-start gap-2 text-sm text-gray-700">
+              <input
+                type="checkbox"
+                checked={acceptTerms}
+                onChange={(e) => setAcceptTerms(e.target.checked)}
+                disabled={isLoading}
+                className="mt-0.5 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-600 disabled:bg-gray-100"
+              />
+              <span>
+                I agree to the Terms of Service and Privacy Policy.
+              </span>
             </label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              autoComplete="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600/20"
-            />
-          </div>
 
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-              Password
+            <label className="flex items-start gap-2 text-sm text-gray-700">
+              <input
+                type="checkbox"
+                checked={marketingConsent}
+                onChange={(e) => setMarketingConsent(e.target.checked)}
+                disabled={isLoading}
+                className="mt-0.5 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-600 disabled:bg-gray-100"
+              />
+              <span>I agree to receive product updates and marketing emails.</span>
             </label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              autoComplete="new-password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600/20"
-            />
-          </div>
 
-          <div>
-            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-              Confirm password
-            </label>
-            <input
-              id="confirmPassword"
-              name="confirmPassword"
-              type="password"
-              autoComplete="new-password"
-              required
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600/20"
-            />
-          </div>
-
-          <label className="flex items-start gap-2 text-sm text-gray-700">
-            <input
-              type="checkbox"
-              checked={acceptTerms}
-              onChange={(e) => setAcceptTerms(e.target.checked)}
-              className="mt-0.5 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-600"
-            />
-            <span>
-              I agree to the Terms of Service and Privacy Policy.
-            </span>
-          </label>
-
-          <label className="flex items-start gap-2 text-sm text-gray-700">
-            <input
-              type="checkbox"
-              checked={marketingConsent}
-              onChange={(e) => setMarketingConsent(e.target.checked)}
-              className="mt-0.5 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-600"
-            />
-            <span>I agree to receive product updates and marketing emails.</span>
-          </label>
-
-          {error ? <p className="text-sm text-red-700">{error}</p> : null}
-          {message ? <p className="text-sm text-green-700">{message}</p> : null}
+            {error ? <p className="text-sm text-red-700">{error}</p> : null}
+            {message ? <p className="text-sm text-green-700">{message}</p> : null}
 
             <button
               type="submit"
