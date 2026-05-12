@@ -53,11 +53,9 @@ export default function TermsPage() {
               </p>
             </section>
 
-            <div className="mt-8 rounded-md bg-blue-50 p-4">
-              <p className="text-sm text-blue-900">
-                <strong>MVP Disclaimer:</strong> This page is provided as an MVP placeholder and should be reviewed by legal counsel before production launch.
-              </p>
-            </div>
+            <p className="mt-8 text-xs text-gray-500">
+              These terms may be updated as RunThisRepo develops.
+            </p>
           </div>
         </div>
       </main>

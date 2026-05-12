@@ -12,6 +12,14 @@ export default async function DashboardPage() {
     redirect("/login");
   }
 
+  // Fetch latest 5 analyses
+  const { data: analyses } = await supabase
+    .from("repo_analyses")
+    .select("id, repo_name, repo_url, created_at")
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: false })
+    .limit(5);
+
   async function logout() {
     "use server";
     const serverSupabase = await createClient();
@@ -45,10 +53,46 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-        <section className="mt-8 rounded-lg border border-gray-200 bg-gray-50 p-4">
-          <p className="text-sm text-gray-700">
-            Your saved analysis history will appear here once you analyze repositories while logged in.
-          </p>
+        <section className="mt-8">
+          <h2 className="text-lg font-semibold text-gray-900">Analysis History</h2>
+          
+          {!analyses || analyses.length === 0 ? (
+            <div className="mt-4 rounded-lg border border-gray-200 bg-gray-50 p-4">
+              <p className="text-sm text-gray-700">
+                Your saved analysis history will appear here once you analyze repositories.
+              </p>
+              <Link
+                href="/"
+                className="mt-3 inline-block text-sm font-medium text-blue-700 hover:text-blue-800"
+              >
+                Analyze a repository →
+              </Link>
+            </div>
+          ) : (
+            <div className="mt-4 space-y-2">
+              {analyses.map((analysis) => (
+                <div
+                  key={analysis.id}
+                  className="flex items-center justify-between rounded-lg border border-gray-200 bg-gray-50 p-4 hover:bg-gray-100"
+                >
+                  <div className="flex-1">
+                    <p className="font-medium text-gray-900">{analysis.repo_name}</p>
+                    <p className="text-xs text-gray-600">{analysis.repo_url}</p>
+                    <p className="mt-1 text-xs text-gray-500">
+                      {new Date(analysis.created_at).toLocaleDateString()} at{" "}
+                      {new Date(analysis.created_at).toLocaleTimeString()}
+                    </p>
+                  </div>
+                  <Link
+                    href={`/dashboard/analyses/${analysis.id}`}
+                    className="ml-4 inline-block rounded-md bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700"
+                  >
+                    View
+                  </Link>
+                </div>
+              ))}
+            </div>
+          )}
         </section>
       </div>
     </main>

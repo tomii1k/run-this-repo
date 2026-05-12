@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { cookies } from "next/headers";
+import { createServerClient } from "@supabase/ssr";
 
 import { analyzeRepoWithAI, AnalyzeRepoWithAIError } from "../../../lib/ai/analyzeRepoWithAI";
 import { detectStack } from "../../../lib/analyzer/detectStack";
@@ -34,6 +36,74 @@ function parsePackageJsonScripts(
     };
   } catch {
     return null;
+  }
+}
+
+async function getUserId(): Promise<string | null> {
+  const cookieStore = await cookies();
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return cookieStore.getAll();
+        },
+        setAll(cookiesToSet) {
+          try {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options)
+            );
+          } catch {
+            // Cookies can throw in edge runtime
+          }
+        },
+      },
+    }
+  );
+
+  const { data } = await supabase.auth.getUser();
+  return data.user?.id || null;
+}
+
+async function saveAnalysis(
+  userId: string,
+  repoUrl: string,
+  repoName: string,
+  analysis: unknown
+): Promise<void> {
+  const cookieStore = await cookies();
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return cookieStore.getAll();
+        },
+        setAll(cookiesToSet) {
+          try {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options)
+            );
+          } catch {
+            // Cookies can throw in edge runtime
+          }
+        },
+      },
+    }
+  );
+
+  const { error } = await supabase.from("repo_analyses").insert({
+    user_id: userId,
+    repo_url: repoUrl,
+    repo_name: repoName,
+    analysis_json: analysis,
+    created_at: new Date().toISOString(),
+  });
+
+  if (error && process.env.NODE_ENV === "development") {
+    console.error("Failed to save analysis to database:", error);
   }
 }
 
@@ -87,6 +157,13 @@ export async function POST(request: Request) {
         { error: "Analysis schema validation failed." },
         { status: 500 }
       );
+    }
+
+    // Try to save analysis if user is authenticated
+    const userId = await getUserId();
+    if (userId) {
+      const repoName = parsedRepo.owner + "/" + parsedRepo.repo;
+      await saveAnalysis(userId, parsedRequest.data.repoUrl, repoName, validated.data);
     }
 
     return NextResponse.json(validated.data, { status: 200 });
