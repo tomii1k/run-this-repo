@@ -109,6 +109,16 @@ async function saveAnalysis(
 
 export async function POST(request: Request) {
   const isDevelopment = process.env.NODE_ENV === "development";
+
+  // Check authentication - require logged-in user
+  const userId = await getUserId();
+  if (!userId) {
+    return NextResponse.json(
+      { error: "Authentication required. Please log in to analyze repositories." },
+      { status: 401 }
+    );
+  }
+
   let requestBody: unknown;
   try {
     requestBody = await request.json();
@@ -159,12 +169,9 @@ export async function POST(request: Request) {
       );
     }
 
-    // Try to save analysis if user is authenticated
-    const userId = await getUserId();
-    if (userId) {
-      const repoName = parsedRepo.owner + "/" + parsedRepo.repo;
-      await saveAnalysis(userId, parsedRequest.data.repoUrl, repoName, validated.data);
-    }
+    // Save analysis for authenticated user
+    const repoName = parsedRepo.owner + "/" + parsedRepo.repo;
+    await saveAnalysis(userId, parsedRequest.data.repoUrl, repoName, validated.data);
 
     return NextResponse.json(validated.data, { status: 200 });
   } catch (error) {
