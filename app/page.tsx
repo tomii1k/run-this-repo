@@ -14,7 +14,7 @@ import PublicFooter from "../components/PublicFooter";
 export default function HomePage() {
   const isDevelopment = process.env.NODE_ENV === "development";
   const [user, setUser] = useState<User | null>(null);
-  const [isLoadingAuth, setIsLoadingAuth] = useState(true);
+  const [isHydrated, setIsHydrated] = useState(false);
   const [submittedRepo, setSubmittedRepo] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -28,7 +28,7 @@ export default function HomePage() {
       const { data } = await supabase.auth.getUser();
       if (mounted) {
         setUser(data.user ?? null);
-        setIsLoadingAuth(false);
+        setIsHydrated(true);
       }
     };
 
@@ -45,6 +45,11 @@ export default function HomePage() {
       authListener.subscription.unsubscribe();
     };
   }, []);
+
+  // Prevent hydration mismatch by not rendering until after hydration
+  if (!isHydrated) {
+    return null;
+  }
 
   async function handleAnalyze(url: string) {
     setSubmittedRepo(url);
@@ -135,21 +140,6 @@ export default function HomePage() {
           ) : null}
         </main>
         <PublicFooter />
-      </div>
-    );
-  }
-
-  // Show landing page
-  if (isLoadingAuth) {
-    return (
-      <div className="min-h-screen bg-slate-50">
-        <AuthNav />
-        <main className="mx-auto flex max-w-6xl items-center justify-center px-4 py-24 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="inline-flex h-8 w-8 animate-spin rounded-full border-4 border-slate-200 border-t-blue-600"></div>
-            <p className="mt-4 text-slate-600">Loading...</p>
-          </div>
-        </main>
       </div>
     );
   }
