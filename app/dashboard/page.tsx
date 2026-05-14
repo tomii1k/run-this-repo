@@ -4,6 +4,9 @@ import { createClient } from "../../lib/supabase/server";
 import AuthNav from "../../components/AuthNav";
 import PublicFooter from "../../components/PublicFooter";
 
+const STARTER_DAILY_ANALYSIS_LIMIT = 1;
+const STARTER_HISTORY_LIMIT = 3;
+
 export default async function DashboardPage() {
   const supabase = await createClient();
   const {
@@ -14,13 +17,31 @@ export default async function DashboardPage() {
     redirect("/login");
   }
 
-  // Fetch latest 5 analyses
+  const now = new Date();
+  const startOfUtcDay = new Date(
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())
+  ).toISOString();
+
+  const { count: analysesTodayCount } = await supabase
+    .from("repo_analyses")
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", user.id)
+    .gte("created_at", startOfUtcDay);
+
+  // Starter history: latest 3 analyses
   const { data: analyses } = await supabase
     .from("repo_analyses")
     .select("id, repo_name, repo_url, created_at")
     .eq("user_id", user.id)
     .order("created_at", { ascending: false })
-    .limit(5);
+    .limit(STARTER_HISTORY_LIMIT);
+
+  const analysesUsedToday = analysesTodayCount ?? 0;
+  const analysesRemainingToday = Math.max(
+    STARTER_DAILY_ANALYSIS_LIMIT - analysesUsedToday,
+    0
+  );
+  const limitReached = analysesRemainingToday === 0;
 
   async function logout() {
     "use server";
@@ -65,6 +86,32 @@ export default async function DashboardPage() {
             Paste a GitHub repository URL to get setup steps, environment variables, and safety insights.
           </p>
 
+          <div className="mt-4 rounded-lg border border-blue-200 bg-white/80 px-4 py-3">
+            <p className="text-sm font-medium text-slate-800">
+              You have {analysesRemainingToday}/{STARTER_DAILY_ANALYSIS_LIMIT} analyses remaining today
+            </p>
+            <p className="mt-1 text-xs text-slate-600">
+              Starter plan limit: 1 analysis/day
+            </p>
+          </div>
+
+          {limitReached ? (
+            <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3">
+              <p className="text-sm font-semibold text-amber-800">
+                Daily limit reached on Starter.
+              </p>
+              <p className="mt-1 text-xs text-amber-700">
+                Upgrade to Pro for unlimited analyses, full history, and priority processing.
+              </p>
+              <Link
+                href="/#pricing"
+                className="mt-3 inline-block rounded-lg bg-slate-900 px-4 py-2 text-xs font-semibold text-white hover:bg-slate-800"
+              >
+                Upgrade to Pro
+              </Link>
+            </div>
+          ) : null}
+
           <div className="mt-6 space-y-3">
             <div className="flex flex-col gap-2 sm:flex-row">
               <input
@@ -74,7 +121,11 @@ export default async function DashboardPage() {
               />
               <Link
                 href="/"
-                className="rounded-lg bg-blue-600 px-6 py-2 text-sm font-semibold text-white hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2"
+                className={`rounded-lg px-6 py-2 text-sm font-semibold text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 ${
+                  limitReached
+                    ? "pointer-events-none bg-slate-400"
+                    : "bg-blue-600 hover:bg-blue-700"
+                }`}
               >
                 Analyze
               </Link>
@@ -87,7 +138,7 @@ export default async function DashboardPage() {
 
         {/* Recent Analyses */}
         <section>
-          <h2 className="text-xl font-bold text-slate-900">Recent Analyses</h2>
+          <h2 className="text-xl font-bold text-slate-900">Recent Analyses (Last 3)</h2>
           
           {!analyses || analyses.length === 0 ? (
             <div className="mt-4 rounded-xl border border-slate-200 bg-white p-6">

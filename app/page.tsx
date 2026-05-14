@@ -326,65 +326,88 @@ export default function HomePage() {
           <section id="pricing" className="py-16 sm:py-20">
             <div className="mb-12 text-center">
               <h2 className="text-4xl font-bold text-slate-900 sm:text-5xl">Pricing</h2>
-              <p className="mx-auto mt-4 max-w-2xl text-lg text-slate-600">Start free. No credit card required.</p>
+              <p className="mx-auto mt-4 max-w-2xl text-lg text-slate-600">
+                Start on Starter. Upgrade to Pro for unlimited analysis and faster processing.
+              </p>
             </div>
 
-            <div className="mx-auto max-w-2xl">
-              <div className="rounded-2xl border border-slate-200/60 bg-white/70 backdrop-blur-sm shadow-xl overflow-hidden hover:shadow-2xl transition-shadow">
-                {/* Header */}
-                <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-8 py-6">
-                  <h3 className="text-3xl font-bold text-white">Free</h3>
-                  <p className="mt-2 text-blue-100">During MVP. Everything included.</p>
-                </div>
-
-                {/* Content */}
-                <div className="p-8">
-                  <div className="space-y-4">
-                    <div className="flex items-start gap-3">
-                      <svg className="h-6 w-6 flex-shrink-0 text-green-600 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                      <div>
-                        <p className="font-semibold text-slate-900">Analyze public repositories</p>
-                        <p className="text-sm text-slate-600">Scan any GitHub repo for setup requirements</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <svg className="h-6 w-6 flex-shrink-0 text-green-600 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                      <div>
-                        <p className="font-semibold text-slate-900">Save analysis history</p>
-                        <p className="text-sm text-slate-600">Keep your last 5 analyses on the dashboard</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <svg className="h-6 w-6 flex-shrink-0 text-green-600 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                      <div>
-                        <p className="font-semibold text-slate-900">Terminal error translator</p>
-                        <p className="text-sm text-slate-600">Get explanations for common errors</p>
-                      </div>
-                    </div>
+            <div className="mx-auto grid max-w-5xl gap-6 lg:grid-cols-2">
+              <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-md">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <h3 className="text-2xl font-bold text-slate-900">Starter</h3>
+                    <p className="mt-1 text-sm text-slate-600">Free plan</p>
                   </div>
-
-                  {user ? (
-                    <Link
-                      href="/dashboard"
-                      className="mt-8 block w-full rounded-lg bg-blue-600 py-3 text-center font-semibold text-white hover:bg-blue-700 transition-colors shadow-md hover:shadow-lg"
-                    >
-                      Start analyzing
-                    </Link>
-                  ) : (
-                    <Link
-                      href="/signup"
-                      className="mt-8 block w-full rounded-lg bg-blue-600 py-3 text-center font-semibold text-white hover:bg-blue-700 transition-colors shadow-md hover:shadow-lg"
-                    >
-                      Create free account
-                    </Link>
-                  )}
+                  <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+                    Basic
+                  </span>
                 </div>
+
+                <div className="mt-6">
+                  <p className="text-4xl font-bold text-slate-900">$0</p>
+                  <p className="mt-1 text-sm text-slate-600">per month</p>
+                </div>
+
+                <div className="mt-6 space-y-3 text-sm text-slate-700">
+                  <p className="rounded-lg bg-slate-50 px-3 py-2 font-medium">
+                    1 analysis per day
+                  </p>
+                  <p className="rounded-lg bg-slate-50 px-3 py-2">
+                    Last 3 analyses history
+                  </p>
+                  <p className="rounded-lg bg-slate-50 px-3 py-2">Basic setup report</p>
+                  <p className="rounded-lg bg-slate-50 px-3 py-2 text-slate-500">
+                    No advanced insights
+                  </p>
+                </div>
+
+                <Link
+                  href={user ? "/dashboard" : "/signup"}
+                  className="mt-8 block w-full rounded-lg border border-slate-300 bg-white py-3 text-center font-semibold text-slate-900 hover:bg-slate-50"
+                >
+                  {user ? "Continue with Starter" : "Start free"}
+                </Link>
+              </div>
+
+              <div className="relative rounded-2xl border-2 border-blue-500 bg-white p-8 shadow-xl">
+                <div className="absolute -top-3 left-6 rounded-full bg-blue-600 px-3 py-1 text-xs font-semibold text-white">
+                  Most popular
+                </div>
+
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <h3 className="text-2xl font-bold text-slate-900">Pro</h3>
+                    <p className="mt-1 text-sm text-slate-600">For power users</p>
+                  </div>
+                  <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-800">
+                    50% off
+                  </span>
+                </div>
+
+                <div className="mt-6 flex items-end gap-2">
+                  <span className="text-lg text-slate-400 line-through">$15</span>
+                  <span className="text-4xl font-bold text-slate-900">$8</span>
+                  <span className="pb-1 text-sm text-slate-600">/month</span>
+                </div>
+
+                <div className="mt-6 space-y-3 text-sm text-slate-700">
+                  <p className="rounded-lg bg-blue-50 px-3 py-2 font-medium text-blue-900">
+                    Unlimited analyses
+                  </p>
+                  <p className="rounded-lg bg-blue-50 px-3 py-2">Full history</p>
+                  <p className="rounded-lg bg-blue-50 px-3 py-2">Advanced insights</p>
+                  <p className="rounded-lg bg-blue-50 px-3 py-2">Priority processing</p>
+                </div>
+
+                <Link
+                  href={user ? "/dashboard" : "/signup"}
+                  className="mt-8 block w-full rounded-lg bg-blue-600 py-3 text-center font-semibold text-white hover:bg-blue-700"
+                >
+                  Upgrade to Pro
+                </Link>
+                <p className="mt-2 text-center text-xs text-slate-500">
+                  Limited-time offer. Payments coming soon.
+                </p>
               </div>
             </div>
           </section>

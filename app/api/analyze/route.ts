@@ -14,6 +14,8 @@ const AnalyzeRequestSchema = z.object({
   repoUrl: z.string().trim().min(1),
 });
 
+const STARTER_DAILY_ANALYSIS_LIMIT = 1;
+
 function parsePackageJsonScripts(
   fetchedFiles: { path: string; content: string }[]
 ): ParsedPackageJson | null {
@@ -107,6 +109,47 @@ async function saveAnalysis(
   }
 }
 
+async function countAnalysesToday(userId: string): Promise<number> {
+  const cookieStore = await cookies();
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return cookieStore.getAll();
+        },
+        setAll(cookiesToSet) {
+          try {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options)
+            );
+          } catch {
+            // Cookies can throw in edge runtime
+          }
+        },
+      },
+    }
+  );
+
+  const now = new Date();
+  const startOfUtcDay = new Date(
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())
+  ).toISOString();
+
+  const { count, error } = await supabase
+    .from("repo_analyses")
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", userId)
+    .gte("created_at", startOfUtcDay);
+
+  if (error && process.env.NODE_ENV === "development") {
+    console.error("Failed to count daily analyses:", error);
+  }
+
+  return count ?? 0;
+}
+
 export async function POST(request: Request) {
   const isDevelopment = process.env.NODE_ENV === "development";
 
@@ -116,6 +159,18 @@ export async function POST(request: Request) {
     return NextResponse.json(
       { error: "Authentication required. Please log in to analyze repositories." },
       { status: 401 }
+    );
+  }
+
+  const analysesToday = await countAnalysesToday(userId);
+  if (analysesToday >= STARTER_DAILY_ANALYSIS_LIMIT) {
+    return NextResponse.json(
+      {
+        error:
+          "Daily Starter limit reached (1/1 analyses). Upgrade to Pro for unlimited analyses.",
+        limitReached: true,
+      },
+      { status: 429 }
     );
   }
 
