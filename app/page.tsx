@@ -42,45 +42,29 @@ export default function HomePage() {
     return null;
   }
 
-  // Logged-in users: Welcome page with dashboard link
-  if (user) {
-    return (
-      <div className="min-h-screen bg-slate-50">
-        <AuthNav />
-
-        <main className="mx-auto max-w-6xl px-4 py-24 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h1 className="text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl">
-              Welcome back!
-            </h1>
-            <p className="mx-auto mt-6 max-w-2xl text-lg text-slate-600">
-              Ready to analyze a repository and get setup guidance?
-            </p>
-
-            <div className="mt-8">
-              <Link
-                href="/dashboard"
-                className="inline-block rounded-lg bg-blue-600 px-8 py-3 font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2"
-              >
-                Go to Dashboard
-              </Link>
-            </div>
-          </div>
-        </main>
-
-        <PublicFooter />
-      </div>
-    );
-  }
-
-  // Logged-out users: Polished SaaS landing page
+  // Polished SaaS landing page for all users (logged-in and logged-out)
   return (
-    <div className="relative min-h-screen bg-slate-50">
-      {/* Subtle blue radial gradient background */}
-      <div className="absolute inset-0 flex items-start justify-center overflow-hidden">
-        <div className="relative h-96 w-full max-w-4xl">
-          <div className="absolute inset-0 rounded-full bg-gradient-to-br from-blue-400/20 via-blue-300/10 to-transparent blur-3xl opacity-40"></div>
-        </div>
+    <div className="relative min-h-screen bg-slate-50 overflow-hidden">
+      {/* Premium background with multiple gradient layers */}
+      <div className="absolute inset-0">
+        {/* Base gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-50 via-blue-50/30 to-slate-50"></div>
+
+        {/* Large radial gradient for hero section */}
+        <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-96 h-96 bg-gradient-to-br from-blue-400/15 via-blue-300/10 to-transparent rounded-full blur-3xl"></div>
+
+        {/* Secondary accent glow on the right */}
+        <div className="absolute top-1/3 -right-32 w-96 h-96 bg-gradient-to-l from-indigo-300/5 via-blue-200/5 to-transparent rounded-full blur-3xl"></div>
+
+        {/* Subtle dot pattern using radial gradient */}
+        <div
+          className="absolute inset-0 opacity-30"
+          style={{
+            backgroundImage:
+              "radial-gradient(circle, rgba(71, 85, 105, 0.15) 1px, transparent 1px)",
+            backgroundSize: "50px 50px",
+          }}
+        ></div>
       </div>
 
       {/* Content */}
@@ -89,52 +73,114 @@ export default function HomePage() {
 
         <main className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           {/* Hero Section */}
-          <section className="py-16 sm:py-24">
-            <div className="text-center">
-              <h1 className="text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl md:text-6xl">
-                Run any GitHub repo
-                <span className="block text-blue-600">without guessing</span>
-              </h1>
-              <p className="mx-auto mt-6 max-w-2xl text-lg text-slate-600 sm:text-xl">
-                Get setup steps, environment variables, common fixes, and safety insights before you run unfamiliar code.
-              </p>
-              <p className="mx-auto mt-4 max-w-2xl text-sm text-slate-500">
-                No code execution. Public repositories only. Setup guidance in seconds.
-              </p>
+          <section className="py-20 sm:py-28">
+            <div className="relative">
+              {/* Gradient blob behind hero text */}
+              <div className="absolute -inset-10 bg-gradient-to-br from-blue-100/40 to-indigo-100/20 rounded-3xl blur-2xl -z-10"></div>
 
-              {/* CTA Buttons */}
-              <div className="mx-auto mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
-                <Link
-                  href="/signup"
-                  className="rounded-lg bg-blue-600 px-8 py-3 font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2"
-                >
-                  Get started
-                </Link>
-                <Link
-                  href="/login"
-                  className="rounded-lg border border-slate-300 bg-white px-8 py-3 font-semibold text-slate-900 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2"
-                >
-                  Log in
-                </Link>
+              <div className="text-center">
+                <div className="inline-flex items-center gap-2 mb-6 px-4 py-2 bg-white/80 backdrop-blur-sm rounded-full border border-slate-200/50 shadow-sm">
+                  <span className="inline-block w-2 h-2 bg-blue-600 rounded-full"></span>
+                  <span className="text-xs font-semibold text-slate-700">Analyze GitHub Repos Instantly</span>
+                </div>
+
+                <h1 className="text-5xl font-bold tracking-tight text-slate-900 sm:text-6xl md:text-7xl">
+                  Run any GitHub repo
+                  <span className="block bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                    without guessing
+                  </span>
+                </h1>
+
+                <p className="mx-auto mt-8 max-w-3xl text-lg text-slate-600 sm:text-xl leading-relaxed">
+                  Get setup steps, environment variables, common fixes, and safety insights before you run unfamiliar code.
+                </p>
+
+                <div className="mx-auto mt-4 max-w-2xl">
+                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50/50 rounded-lg border border-blue-200/30">
+                    <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m7 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span className="text-sm text-slate-600">
+                      No code execution. Public repositories only. Setup guidance in seconds.
+                    </span>
+                  </div>
+                </div>
+
+                {/* CTA Buttons */}
+                <div className="mx-auto mt-12 flex flex-col gap-4 sm:flex-row sm:justify-center">
+                  {user ? (
+                    <>
+                      <Link
+                        href="/dashboard"
+                        className="rounded-lg bg-blue-600 px-8 py-4 font-semibold text-white hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 shadow-lg hover:shadow-xl"
+                      >
+                        Analyze repository
+                      </Link>
+                      <Link
+                        href="/dashboard"
+                        className="rounded-lg border border-slate-300 bg-white px-8 py-4 font-semibold text-slate-900 hover:bg-slate-50 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 shadow-md"
+                      >
+                        View dashboard
+                      </Link>
+                    </>
+                  ) : (
+                    <>
+                      <Link
+                        href="/signup"
+                        className="rounded-lg bg-blue-600 px-8 py-4 font-semibold text-white hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 shadow-lg hover:shadow-xl"
+                      >
+                        Get started
+                      </Link>
+                      <Link
+                        href="/login"
+                        className="rounded-lg border border-slate-300 bg-white px-8 py-4 font-semibold text-slate-900 hover:bg-slate-50 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 shadow-md"
+                      >
+                        Log in
+                      </Link>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              {/* Hero preview card */}
+              <div className="mt-16 mx-auto max-w-3xl">
+                <div className="rounded-2xl bg-white/60 backdrop-blur-sm border border-slate-200/50 shadow-2xl overflow-hidden">
+                  <div className="bg-gradient-to-r from-slate-100 to-blue-50 px-6 py-4 border-b border-slate-200/50">
+                    <div className="flex gap-2">
+                      <div className="w-3 h-3 rounded-full bg-red-400"></div>
+                      <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
+                      <div className="w-3 h-3 rounded-full bg-green-400"></div>
+                    </div>
+                  </div>
+                  <div className="p-6 space-y-3">
+                    <div className="h-4 bg-gradient-to-r from-slate-200 to-slate-100 rounded w-3/4"></div>
+                    <div className="h-3 bg-slate-100 rounded w-full"></div>
+                    <div className="h-3 bg-slate-100 rounded w-5/6"></div>
+                    <div className="pt-2 space-y-2">
+                      <div className="h-2 bg-blue-100 rounded w-full"></div>
+                      <div className="h-2 bg-blue-100 rounded w-4/5"></div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </section>
 
           {/* Features Section */}
-          <section id="features" className="py-12 sm:py-16">
-            <div className="mb-10 text-center">
-              <h2 className="text-3xl font-bold text-slate-900 sm:text-4xl">
+          <section id="features" className="py-16 sm:py-20">
+            <div className="mb-12 text-center">
+              <h2 className="text-4xl font-bold text-slate-900 sm:text-5xl">
                 Everything you need to get started
               </h2>
-              <p className="mx-auto mt-3 max-w-xl text-lg text-slate-600">
+              <p className="mx-auto mt-4 max-w-2xl text-lg text-slate-600">
                 Get all the information needed to run any repository safely and correctly.
               </p>
             </div>
 
-            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
               {/* Feature 1 */}
-              <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow">
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-blue-100">
+              <div className="group rounded-2xl border border-slate-200/60 bg-white/70 backdrop-blur-sm p-6 shadow-md hover:shadow-lg transition-all hover:border-slate-300 hover:bg-white">
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-blue-100 to-blue-50 group-hover:from-blue-200 group-hover:to-blue-100 transition-colors">
                   <svg
                     className="h-6 w-6 text-blue-600"
                     fill="none"
@@ -156,8 +202,8 @@ export default function HomePage() {
               </div>
 
               {/* Feature 2 */}
-              <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow">
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-blue-100">
+              <div className="group rounded-2xl border border-slate-200/60 bg-white/70 backdrop-blur-sm p-6 shadow-md hover:shadow-lg transition-all hover:border-slate-300 hover:bg-white">
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-blue-100 to-blue-50 group-hover:from-blue-200 group-hover:to-blue-100 transition-colors">
                   <svg
                     className="h-6 w-6 text-blue-600"
                     fill="none"
@@ -179,8 +225,8 @@ export default function HomePage() {
               </div>
 
               {/* Feature 3 */}
-              <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow">
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-blue-100">
+              <div className="group rounded-2xl border border-slate-200/60 bg-white/70 backdrop-blur-sm p-6 shadow-md hover:shadow-lg transition-all hover:border-slate-300 hover:bg-white">
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-blue-100 to-blue-50 group-hover:from-blue-200 group-hover:to-blue-100 transition-colors">
                   <svg
                     className="h-6 w-6 text-blue-600"
                     fill="none"
@@ -202,8 +248,8 @@ export default function HomePage() {
               </div>
 
               {/* Feature 4 */}
-              <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow">
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-blue-100">
+              <div className="group rounded-2xl border border-slate-200/60 bg-white/70 backdrop-blur-sm p-6 shadow-md hover:shadow-lg transition-all hover:border-slate-300 hover:bg-white">
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-blue-100 to-blue-50 group-hover:from-blue-200 group-hover:to-blue-100 transition-colors">
                   <svg
                     className="h-6 w-6 text-blue-600"
                     fill="none"
@@ -227,49 +273,49 @@ export default function HomePage() {
           </section>
 
           {/* How it Works Section */}
-          <section id="how-it-works" className="py-12 sm:py-16">
-            <div className="mb-10 text-center">
-              <h2 className="text-3xl font-bold text-slate-900 sm:text-4xl">
+          <section id="how-it-works" className="py-16 sm:py-20">
+            <div className="mb-12 text-center">
+              <h2 className="text-4xl font-bold text-slate-900 sm:text-5xl">
                 How it works
               </h2>
             </div>
 
             <div className="grid gap-6 sm:grid-cols-3">
               {/* Step 1 */}
-              <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+              <div className="rounded-2xl border border-slate-200/60 bg-white/70 backdrop-blur-sm p-8 shadow-md hover:shadow-lg transition-all">
                 <div className="flex items-center justify-center">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 text-lg font-bold text-blue-600">
+                  <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-lg font-bold text-white shadow-md">
                     1
                   </div>
                 </div>
-                <h3 className="mt-4 text-center font-semibold text-slate-900">Paste GitHub URL</h3>
-                <p className="mt-2 text-center text-sm text-slate-600">
+                <h3 className="mt-6 text-center font-semibold text-slate-900">Paste GitHub URL</h3>
+                <p className="mt-3 text-center text-sm text-slate-600">
                   Enter any public GitHub repository URL
                 </p>
               </div>
 
               {/* Step 2 */}
-              <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+              <div className="rounded-2xl border border-slate-200/60 bg-white/70 backdrop-blur-sm p-8 shadow-md hover:shadow-lg transition-all">
                 <div className="flex items-center justify-center">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 text-lg font-bold text-blue-600">
+                  <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-lg font-bold text-white shadow-md">
                     2
                   </div>
                 </div>
-                <h3 className="mt-4 text-center font-semibold text-slate-900">Run Analysis</h3>
-                <p className="mt-2 text-center text-sm text-slate-600">
+                <h3 className="mt-6 text-center font-semibold text-slate-900">Run Analysis</h3>
+                <p className="mt-3 text-center text-sm text-slate-600">
                   We analyze the repository in seconds
                 </p>
               </div>
 
               {/* Step 3 */}
-              <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+              <div className="rounded-2xl border border-slate-200/60 bg-white/70 backdrop-blur-sm p-8 shadow-md hover:shadow-lg transition-all">
                 <div className="flex items-center justify-center">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 text-lg font-bold text-blue-600">
+                  <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-lg font-bold text-white shadow-md">
                     3
                   </div>
                 </div>
-                <h3 className="mt-4 text-center font-semibold text-slate-900">Get Setup Report</h3>
-                <p className="mt-2 text-center text-sm text-slate-600">
+                <h3 className="mt-6 text-center font-semibold text-slate-900">Get Setup Report</h3>
+                <p className="mt-3 text-center text-sm text-slate-600">
                   Follow the detailed setup guide for your OS
                 </p>
               </div>
@@ -277,68 +323,108 @@ export default function HomePage() {
           </section>
 
           {/* Pricing Section */}
-          <section id="pricing" className="py-12 sm:py-16">
-            <div className="mb-10 text-center">
-              <h2 className="text-3xl font-bold text-slate-900 sm:text-4xl">Pricing</h2>
+          <section id="pricing" className="py-16 sm:py-20">
+            <div className="mb-12 text-center">
+              <h2 className="text-4xl font-bold text-slate-900 sm:text-5xl">Pricing</h2>
+              <p className="mx-auto mt-4 max-w-2xl text-lg text-slate-600">Start free. No credit card required.</p>
             </div>
 
-            <div className="mx-auto max-w-2xl rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
-              <div className="text-center">
-                <h3 className="text-2xl font-bold text-slate-900">Free</h3>
-                <p className="mt-2 text-sm text-slate-600">During MVP</p>
-
-                <div className="mt-6 space-y-3 text-left">
-                  <div className="flex items-center gap-3">
-                    <svg className="h-5 w-5 flex-shrink-0 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                    <span className="text-slate-700">Analyze public repositories</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <svg className="h-5 w-5 flex-shrink-0 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                    <span className="text-slate-700">Save analysis history</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <svg className="h-5 w-5 flex-shrink-0 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                    <span className="text-slate-700">Terminal error translator</span>
-                  </div>
+            <div className="mx-auto max-w-2xl">
+              <div className="rounded-2xl border border-slate-200/60 bg-white/70 backdrop-blur-sm shadow-xl overflow-hidden hover:shadow-2xl transition-shadow">
+                {/* Header */}
+                <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-8 py-6">
+                  <h3 className="text-3xl font-bold text-white">Free</h3>
+                  <p className="mt-2 text-blue-100">During MVP. Everything included.</p>
                 </div>
 
-                <Link
-                  href="/signup"
-                  className="mt-8 inline-block rounded-lg bg-blue-600 px-8 py-3 font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2"
-                >
-                  Create free account
-                </Link>
+                {/* Content */}
+                <div className="p-8">
+                  <div className="space-y-4">
+                    <div className="flex items-start gap-3">
+                      <svg className="h-6 w-6 flex-shrink-0 text-green-600 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                      <div>
+                        <p className="font-semibold text-slate-900">Analyze public repositories</p>
+                        <p className="text-sm text-slate-600">Scan any GitHub repo for setup requirements</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <svg className="h-6 w-6 flex-shrink-0 text-green-600 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                      <div>
+                        <p className="font-semibold text-slate-900">Save analysis history</p>
+                        <p className="text-sm text-slate-600">Keep your last 5 analyses on the dashboard</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <svg className="h-6 w-6 flex-shrink-0 text-green-600 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                      <div>
+                        <p className="font-semibold text-slate-900">Terminal error translator</p>
+                        <p className="text-sm text-slate-600">Get explanations for common errors</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {user ? (
+                    <Link
+                      href="/dashboard"
+                      className="mt-8 block w-full rounded-lg bg-blue-600 py-3 text-center font-semibold text-white hover:bg-blue-700 transition-colors shadow-md hover:shadow-lg"
+                    >
+                      Start analyzing
+                    </Link>
+                  ) : (
+                    <Link
+                      href="/signup"
+                      className="mt-8 block w-full rounded-lg bg-blue-600 py-3 text-center font-semibold text-white hover:bg-blue-700 transition-colors shadow-md hover:shadow-lg"
+                    >
+                      Create free account
+                    </Link>
+                  )}
+                </div>
               </div>
             </div>
           </section>
 
           {/* Final CTA Section */}
-          <section className="py-12 sm:py-16">
-            <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-blue-50 to-indigo-50 p-8 text-center shadow-sm sm:p-12">
-              <h2 className="text-3xl font-bold text-slate-900">Ready to get started?</h2>
+          <section className="py-16 sm:py-20">
+            <div className="rounded-2xl border border-slate-200/60 bg-gradient-to-br from-blue-50/60 to-indigo-50/40 backdrop-blur-sm p-8 text-center shadow-lg sm:p-12 hover:shadow-xl transition-shadow">
+              <h2 className="text-4xl font-bold text-slate-900">Ready to get started?</h2>
               <p className="mx-auto mt-4 max-w-xl text-lg text-slate-600">
-                Create a free account to analyze repositories and save your setup guides.
+                {user
+                  ? "Head to your dashboard and analyze your first repository today."
+                  : "Create a free account to analyze repositories and save your setup guides."}
               </p>
 
-              <div className="mx-auto mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
-                <Link
-                  href="/signup"
-                  className="rounded-lg bg-blue-600 px-8 py-3 font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2"
-                >
-                  Create account
-                </Link>
-                <Link
-                  href="/login"
-                  className="rounded-lg border border-slate-300 bg-white px-8 py-3 font-semibold text-slate-900 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2"
-                >
-                  Sign in
-                </Link>
+              <div className="mx-auto mt-8 flex flex-col gap-4 sm:flex-row sm:justify-center">
+                {user ? (
+                  <>
+                    <Link
+                      href="/dashboard"
+                      className="rounded-lg bg-blue-600 px-8 py-4 font-semibold text-white hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 shadow-lg hover:shadow-xl"
+                    >
+                      Go to dashboard
+                    </Link>
+                  </>
+                ) : (
+                  <>
+                    <Link
+                      href="/signup"
+                      className="rounded-lg bg-blue-600 px-8 py-4 font-semibold text-white hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 shadow-lg hover:shadow-xl"
+                    >
+                      Create account
+                    </Link>
+                    <Link
+                      href="/login"
+                      className="rounded-lg border border-slate-300 bg-white px-8 py-4 font-semibold text-slate-900 hover:bg-slate-50 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 shadow-md"
+                    >
+                      Sign in
+                    </Link>
+                  </>
+                )}
               </div>
             </div>
           </section>
