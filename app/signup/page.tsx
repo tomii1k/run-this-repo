@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { createClient } from "../../lib/supabase/client";
 import AuthNav from "../../components/AuthNav";
@@ -36,10 +36,9 @@ function isPasswordValid(validation: PasswordValidation): boolean {
 
 export default function SignupPage() {
   const supabase = createClient();
-  const router = useRouter();
   const searchParams = useSearchParams();
-  const selectedPlan = searchParams.get("plan") === "pro" ? "pro" : "free";
-  const planLabel = selectedPlan === "pro" ? "Pro" : "Free";
+  const initialPlan = searchParams.get("plan") === "free" ? "free" : "pro";
+  const [selectedPlan, setSelectedPlan] = useState<"pro" | "free">(initialPlan);
   const isDevelopment = process.env.NODE_ENV === "development";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -47,7 +46,7 @@ export default function SignupPage() {
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [marketingConsent, setMarketingConsent] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [message, setMessage] = useState<string | null>(null);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [passwordValidation, setPasswordValidation] = useState<PasswordValidation>({
     minLength: false,
@@ -65,7 +64,7 @@ export default function SignupPage() {
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError(null);
-    setMessage(null);
+    setShowSuccessModal(false);
     if (isDevelopment) {
       console.info("signup started");
     }
@@ -103,6 +102,7 @@ export default function SignupPage() {
         emailRedirectTo: `${window.location.origin}/auth/callback`,
         data: {
           plan: selectedPlan,
+          selected_plan: selectedPlan,
           marketing_consent: marketingConsent,
           terms_accepted: true,
           terms_accepted_at: new Date().toISOString(),
@@ -143,14 +143,7 @@ export default function SignupPage() {
     if (isDevelopment) {
       console.info("signup success");
     }
-    if (data.session) {
-      const destination =
-        selectedPlan === "pro" ? "/dashboard?plan=pro" : "/dashboard";
-      router.push(destination);
-      return;
-    }
-
-    setMessage("Account created. Please check your email inbox to confirm your account.");
+    setShowSuccessModal(true);
   };
 
   const PasswordCheckItem = ({ passed, text }: { passed: boolean; text: string }) => (
@@ -169,9 +162,30 @@ export default function SignupPage() {
         <div className="mx-auto w-full max-w-md rounded-xl border border-gray-200 bg-white p-6 shadow-sm sm:p-8">
           <h1 className="text-center text-2xl font-bold text-gray-900">Create account</h1>
           <p className="mt-2 text-center text-sm text-gray-600">Start saving analyses to your dashboard.</p>
-          <div className="mt-4 rounded-lg border border-blue-100 bg-blue-50 px-4 py-3 text-center">
-            <p className="text-xs uppercase tracking-wide text-blue-700">Selected plan</p>
-            <p className="mt-1 text-sm font-semibold text-blue-900">Plan: {planLabel}</p>
+          <div className="mt-4 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3">
+            <div className="flex items-center justify-between">
+              <label htmlFor="plan" className="text-sm font-semibold text-slate-900">
+                Choose your plan
+              </label>
+              <span className="rounded-full bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-700">
+                50% OFF
+              </span>
+            </div>
+            <select
+              id="plan"
+              name="plan"
+              value={selectedPlan}
+              onChange={(e) => setSelectedPlan(e.target.value === "free" ? "free" : "pro")}
+              className="mt-3 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600/20"
+            >
+              <option value="pro">Pro — $8/month (50% off)</option>
+              <option value="free">Free — 1 analysis per day</option>
+            </select>
+            <p className="mt-3 text-sm text-slate-600">
+              {selectedPlan === "pro"
+                ? "Unlimited analyses, full history, advanced insights, priority processing."
+                : "1 analysis per day, last 3 analyses saved, basic reports."}
+            </p>
           </div>
 
           <form onSubmit={handleSubmit} className="mt-6 space-y-4">
@@ -263,7 +277,6 @@ export default function SignupPage() {
             </label>
 
             {error ? <p className="text-sm text-red-700">{error}</p> : null}
-            {message ? <p className="text-sm text-green-700">{message}</p> : null}
 
             <button
               type="submit"
@@ -282,6 +295,68 @@ export default function SignupPage() {
           </p>
         </div>
       </main>
+      {showSuccessModal ? (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 px-4 py-6"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="signup-success-title"
+        >
+          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl sm:p-8">
+            <div className="flex items-center gap-3">
+              <div className="flex h-11 w-11 items-center justify-center rounded-full bg-blue-100">
+                <svg
+                  className="h-6 w-6 text-blue-600"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={1.8}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M3 7.5l9 6 9-6M4.5 7h15a1.5 1.5 0 011.5 1.5v7a1.5 1.5 0 01-1.5 1.5h-15A1.5 1.5 0 013 15.5v-7A1.5 1.5 0 014.5 7z"
+                  />
+                </svg>
+              </div>
+              <div>
+                <h2 id="signup-success-title" className="text-xl font-semibold text-slate-900">
+                  Check your email
+                </h2>
+                <p className="mt-1 text-sm text-slate-600">
+                  We sent a confirmation link to your inbox. Please confirm your email address to
+                  activate your RunThisRepo account.
+                </p>
+              </div>
+            </div>
+
+            {email ? (
+              <div className="mt-4 rounded-lg border border-blue-100 bg-blue-50 px-4 py-3 text-sm text-blue-900">
+                Sent to <span className="font-semibold">{email}</span>
+              </div>
+            ) : null}
+
+            <p className="mt-4 text-xs text-slate-500">
+              Didn&apos;t receive it? Check your spam folder.
+            </p>
+
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+              <Link
+                href="/login"
+                className="inline-flex w-full items-center justify-center rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2"
+              >
+                Go to login
+              </Link>
+              <Link
+                href="/"
+                className="inline-flex w-full items-center justify-center rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2"
+              >
+                Back to home
+              </Link>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
