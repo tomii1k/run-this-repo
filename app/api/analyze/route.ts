@@ -41,7 +41,12 @@ function parsePackageJsonScripts(
   }
 }
 
-async function getUserId(): Promise<string | null> {
+type AuthUser = {
+  id: string;
+  plan: "free" | "pro";
+};
+
+async function getUser(): Promise<AuthUser | null> {
   const cookieStore = await cookies();
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -65,7 +70,13 @@ async function getUserId(): Promise<string | null> {
   );
 
   const { data } = await supabase.auth.getUser();
-  return data.user?.id || null;
+  if (!data.user) return null;
+
+  const plan = data.user.user_metadata?.plan === "pro" ? "pro" : "free";
+  return {
+    id: data.user.id,
+    plan,
+  };
 }
 
 async function saveAnalysis(
@@ -154,24 +165,26 @@ export async function POST(request: Request) {
   const isDevelopment = process.env.NODE_ENV === "development";
 
   // Check authentication - require logged-in user
-  const userId = await getUserId();
-  if (!userId) {
+  const user = await getUser();
+  if (!user) {
     return NextResponse.json(
       { error: "Authentication required. Please log in to analyze repositories." },
       { status: 401 }
     );
   }
 
-  const analysesToday = await countAnalysesToday(userId);
-  if (analysesToday >= STARTER_DAILY_ANALYSIS_LIMIT) {
-    return NextResponse.json(
-      {
-        error:
-          "Daily Starter limit reached (1/1 analyses). Upgrade to Pro for unlimited analyses.",
-        limitReached: true,
-      },
-      { status: 429 }
-    );
+  if (user.plan !== "pro") {
+    const analysesToday = await countAnalysesToday(user.id);
+    if (analysesToday >= STARTER_DAILY_ANALYSIS_LIMIT) {
+      return NextResponse.json(
+        {
+          error:
+            "Daily Free limit reached (1/1 analyses). Upgrade to Pro for unlimited analyses.",
+          limitReached: true,
+        },
+        { status: 429 }
+      );
+    }
   }
 
   let requestBody: unknown;
@@ -226,7 +239,7 @@ export async function POST(request: Request) {
 
     // Save analysis for authenticated user
     const repoName = parsedRepo.owner + "/" + parsedRepo.repo;
-    await saveAnalysis(userId, parsedRequest.data.repoUrl, repoName, validated.data);
+    await saveAnalysis(user.id, parsedRequest.data.repoUrl, repoName, validated.data);
 
     return NextResponse.json(validated.data, { status: 200 });
   } catch (error) {

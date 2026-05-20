@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { createClient } from "../../lib/supabase/client";
 import AuthNav from "../../components/AuthNav";
@@ -35,6 +36,10 @@ function isPasswordValid(validation: PasswordValidation): boolean {
 
 export default function SignupPage() {
   const supabase = createClient();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const selectedPlan = searchParams.get("plan") === "pro" ? "pro" : "free";
+  const planLabel = selectedPlan === "pro" ? "Pro" : "Free";
   const isDevelopment = process.env.NODE_ENV === "development";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -97,6 +102,7 @@ export default function SignupPage() {
       options: {
         emailRedirectTo: `${window.location.origin}/auth/callback`,
         data: {
+          plan: selectedPlan,
           marketing_consent: marketingConsent,
           terms_accepted: true,
           terms_accepted_at: new Date().toISOString(),
@@ -137,6 +143,13 @@ export default function SignupPage() {
     if (isDevelopment) {
       console.info("signup success");
     }
+    if (data.session) {
+      const destination =
+        selectedPlan === "pro" ? "/dashboard?plan=pro" : "/dashboard";
+      router.push(destination);
+      return;
+    }
+
     setMessage("Account created. Please check your email inbox to confirm your account.");
   };
 
@@ -156,6 +169,10 @@ export default function SignupPage() {
         <div className="mx-auto w-full max-w-md rounded-xl border border-gray-200 bg-white p-6 shadow-sm sm:p-8">
           <h1 className="text-center text-2xl font-bold text-gray-900">Create account</h1>
           <p className="mt-2 text-center text-sm text-gray-600">Start saving analyses to your dashboard.</p>
+          <div className="mt-4 rounded-lg border border-blue-100 bg-blue-50 px-4 py-3 text-center">
+            <p className="text-xs uppercase tracking-wide text-blue-700">Selected plan</p>
+            <p className="mt-1 text-sm font-semibold text-blue-900">Plan: {planLabel}</p>
+          </div>
 
           <form onSubmit={handleSubmit} className="mt-6 space-y-4">
             <div>

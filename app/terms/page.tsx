@@ -13,59 +13,48 @@ export default function TermsPage() {
           <div className="mt-6 border-t border-gray-200 pt-6 text-gray-900">
             <section className="mt-6">
               <h2 className="text-xl font-semibold text-gray-900">Overview</h2>
-              <p className="mt-3 leading-relaxed text-gray-700">
-                These Terms govern your use of RunThisRepo. By accessing or using the service, you
-                agree to these terms.
+              <p className="mt-3 text-gray-700 leading-relaxed">
+                These Terms of Service govern your use of RunThisRepo and its services. By accessing or using RunThisRepo, you agree to be bound by these terms.
               </p>
             </section>
 
             <section className="mt-6">
-              <h2 className="text-xl font-semibold text-gray-900">Use of Service</h2>
-              <p className="mt-3 leading-relaxed text-gray-700">
-                You agree to use RunThisRepo lawfully and not to misuse the platform.
+              <h2 className="text-xl font-semibold text-gray-900">Use License</h2>
+              <p className="mt-3 text-gray-700 leading-relaxed">
+                Permission is granted to temporarily download one copy of the materials (information or software) on RunThisRepo for personal, non-commercial transitory viewing only. This is the grant of a license, not a transfer of title, and under this license you may not:
               </p>
-              <ul className="mt-3 list-inside list-disc leading-relaxed text-gray-700">
-                <li>Do not attempt unauthorized access to accounts, systems, or data.</li>
-                <li>Do not interfere with service reliability, limits, or security controls.</li>
-                <li>Do not submit unlawful or abusive content.</li>
+              <ul className="mt-3 list-inside list-disc text-gray-700 leading-relaxed">
+                <li>Modify or copy the materials</li>
+                <li>Use the materials for any commercial purpose or for any public display</li>
+                <li>Attempt to reverse engineer any software contained on RunThisRepo</li>
+                <li>Remove any copyright or other proprietary notations from the materials</li>
+                <li>Transfer the materials to another person or "mirror" the materials on any other server</li>
               </ul>
             </section>
 
             <section className="mt-6">
-              <h2 className="text-xl font-semibold text-gray-900">Accounts and Data</h2>
-              <p className="mt-3 leading-relaxed text-gray-700">
-                If you create an account, you are responsible for your account activity. We may store
-                account data, usage data, and analysis history to operate the service.
+              <h2 className="text-xl font-semibold text-gray-900">Disclaimer</h2>
+              <p className="mt-3 text-gray-700 leading-relaxed">
+                The materials on RunThisRepo are provided on an 'as is' basis. RunThisRepo makes no warranties, expressed or implied, and hereby disclaims and negates all other warranties including, without limitation, implied warranties or conditions of merchantability, fitness for a particular purpose, or non-infringement of intellectual property or other violation of rights.
               </p>
             </section>
 
             <section className="mt-6">
-              <h2 className="text-xl font-semibold text-gray-900">Service Provided As-Is</h2>
-              <p className="mt-3 leading-relaxed text-gray-700">
-                RunThisRepo is provided on an "as-is" and "as-available" basis without guarantees of
-                uninterrupted availability, accuracy, or fitness for a particular purpose.
+              <h2 className="text-xl font-semibold text-gray-900">Limitations</h2>
+              <p className="mt-3 text-gray-700 leading-relaxed">
+                In no event shall RunThisRepo or its suppliers be liable for any damages (including, without limitation, damages for loss of data or profit, or due to business interruption) arising out of the use or inability to use the materials on RunThisRepo, even if RunThisRepo or an authorized representative has been notified orally or in writing of the possibility of such damage.
               </p>
             </section>
 
             <section className="mt-6">
-              <h2 className="text-xl font-semibold text-gray-900">Limitation of Liability</h2>
-              <p className="mt-3 leading-relaxed text-gray-700">
-                To the maximum extent permitted by law, RunThisRepo and its operators are not liable for
-                indirect, incidental, special, consequential, or punitive damages, or for loss of data,
-                revenue, or profits arising from use of or inability to use the service.
-              </p>
-            </section>
-
-            <section className="mt-6">
-              <h2 className="text-xl font-semibold text-gray-900">Changes to Terms</h2>
-              <p className="mt-3 leading-relaxed text-gray-700">
-                We may update these Terms over time. Continued use of RunThisRepo after updates means you
-                accept the revised Terms.
+              <h2 className="text-xl font-semibold text-gray-900">Accuracy of Materials</h2>
+              <p className="mt-3 text-gray-700 leading-relaxed">
+                The materials appearing on RunThisRepo could include technical, typographical, or photographic errors. RunThisRepo does not warrant that any of the materials on RunThisRepo are accurate, complete, or current. RunThisRepo may make changes to the materials contained on RunThisRepo at any time without notice.
               </p>
             </section>
 
             <p className="mt-8 text-xs text-gray-500">
-              These terms are intended for MVP-stage operation and may be refined as the service evolves.
+              These terms may be updated as RunThisRepo develops.
             </p>
           </div>
         </div>
